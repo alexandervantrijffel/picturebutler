@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "file": "config.production.js",
+  "sourceRoot": "",
+  "sources": [
+    "config.production.coffee"
+  ],
+  "names": [],
+  "mappings": "AAAA,IAAA,MAAA;;AAAA,MAAA,GAAS,OAAA,CAAQ,iBAAR,CAAT,CAAA;;AAAA,MAEM,CAAC,gBAAP,GACE;AAAA,EAAA,YAAA,EAAc,EAAd;AAAA,EACA,eAAA,EAAiB,EADjB;AAAA,EAEA,gBAAA,EAAkB,EAFlB;AAAA,EAGA,mBAAA,EAAqB,EAHrB;CAHF,CAAA;;AAAA,MAQM,CAAC,OAAO,CAAC,MAAf,GAAwB,MARxB,CAAA;;AAAA,MAUM,CAAC,OAAO,CAAC,KAAf,GAAuB,KAVvB,CAAA"
+}
