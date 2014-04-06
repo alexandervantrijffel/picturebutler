@@ -13,7 +13,7 @@ app = express()
 app.debug = config.debug
 
 app
-  .set "port", process.env.PORT or 3000
+  .set "port", process.env.PORT or 3001
   .use(express.logger("dev"))
   .use express.cookieParser()
   .use express.bodyParser()
