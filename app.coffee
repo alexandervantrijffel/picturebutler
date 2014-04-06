@@ -22,7 +22,7 @@ app
       secret: "secreetbro"
       key: "express.sid"
       store: new MemoryStore())
-  .use app.router
+  .use '/api', app.router
 		.configure 'development', ->
 app.use express.errorHandler(
           dumpExceptions: true

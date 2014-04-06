@@ -30,7 +30,6 @@ loadItems = (callback) ->
 			callback picCache.getStart			
 
 sendStartBatch = (res) ->
-	console.log "lastRefresh #{lastRefresh}"
 	if !lastRefresh || (Date.now() - lastRefresh) / 1000 > 120 # 2 minutes
 		console.log 'refreshing cache'
 		loadItems (items) ->

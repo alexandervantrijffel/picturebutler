@@ -45,7 +45,6 @@ loadItems = function(callback) {
 };
 
 sendStartBatch = function(res) {
-  console.log("lastRefresh " + lastRefresh);
   if (!lastRefresh || (Date.now() - lastRefresh) / 1000 > 120) {
     console.log('refreshing cache');
     return loadItems(function(items) {

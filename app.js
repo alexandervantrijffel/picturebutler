@@ -26,7 +26,7 @@ app.set("port", process.env.PORT || 3001).use(express.logger("dev")).use(express
   secret: "secreetbro",
   key: "express.sid",
   store: new MemoryStore()
-})).use(app.router).configure('development', function() {});
+})).use('/api', app.router).configure('development', function() {});
 
 app.use(express.errorHandler({
   dumpExceptions: true,
