@@ -22,7 +22,7 @@ app = express();
 
 app.debug = config.debug;
 
-app.set("port", process.env.PORT || 3000).use(express.logger("dev")).use(express.cookieParser()).use(express.bodyParser()).use(express.methodOverride()).use(express.session({
+app.set("port", process.env.PORT || 3001).use(express.logger("dev")).use(express.cookieParser()).use(express.bodyParser()).use(express.methodOverride()).use(express.session({
   secret: "secreetbro",
   key: "express.sid",
   store: new MemoryStore()
