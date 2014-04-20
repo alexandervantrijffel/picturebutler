@@ -26,16 +26,16 @@ app.set("port", process.env.PORT || 3001).use(express.logger("dev")).use(express
   secret: "secreetbro",
   key: "express.sid",
   store: new MemoryStore()
-})).use('/api', app.router).configure('development', function() {});
-
-app.use(express.errorHandler({
-  dumpExceptions: true,
-  showStack: true
-})).use(errorHandling.logErrors).use(errorHandling.pageNotFoundHandler).use(errorHandling.clientErrorHandler).use(errorHandling.errorHandler);
+})).use(express.json()).use(express.urlencoded()).use('/api', app.router).configure('development', function() {
+  return app.use(express.errorHandler({
+    dumpExceptions: true,
+    showStack: true
+  }));
+}).use(errorHandling.logErrors).use(errorHandling.pageNotFoundHandler).use(errorHandling.clientErrorHandler).use(errorHandling.errorHandler);
 
 app.resource('pics', require('./pics'));
 
-app.get("/pics/next", pics.next);
+app.post("/pics/next", pics.next);
 
 server = http.createServer(app);
 

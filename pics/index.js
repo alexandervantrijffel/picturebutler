@@ -1,10 +1,12 @@
-var Pic, createImage, fs, lastRefresh, loadItems, picCache, picsPerBatch, sendNextBatch, sendStartBatch, setJson, _;
+var Pic, createImage, fs, getStartBatch, lastRefresh, loadItems, picCache, picsPerBatch, sendNextBatch, sendStartBatch, setJson, _;
 
 Pic = require('../models/Pic').Pic;
 
 _ = require('underscore');
 
 fs = require('fs');
+
+require('coffee-trace');
 
 picCache = new (require('./PicCache').PicCache);
 
@@ -16,14 +18,12 @@ createImage = function(src) {
   return Pic.create({
     src: src,
     postedAt: Date.now()
-  }, (function(_this) {
-    return function(err, thePic) {
-      if (err(console.error)) {
-        "Cannot add picture: " + err;
-      }
-      return console.log("pic added to db with id " + thePic.id);
-    };
-  })(this));
+  }, function(err, thePic) {
+    if (err(console.error)) {
+      "Cannot add picture: " + err;
+    }
+    return console.log("pic added to db with id " + thePic.id);
+  });
 };
 
 setJson = function(res) {
@@ -44,15 +44,21 @@ loadItems = function(callback) {
   });
 };
 
-sendStartBatch = function(res) {
-  if (!lastRefresh || (Date.now() - lastRefresh) / 1000 > 120) {
+getStartBatch = function(res, callback) {
+  if (!lastRefresh || (Date.now() - lastRefresh) / 1000 > 120 || !picCache.items.length) {
     console.log('refreshing cache');
     return loadItems(function(items) {
-      return res.send(picCache.getStart(picsPerBatch));
+      return callback(picCache.getStart(picsPerBatch));
     });
   } else {
-    return res.send(picCache.getStart(picsPerBatch));
+    return callback(picCache.getStart(picsPerBatch));
   }
+};
+
+sendStartBatch = function(res) {
+  return getStartBatch(res, function(items) {
+    return res.send(items);
+  });
 };
 
 sendNextBatch = function(req, res) {
@@ -61,6 +67,13 @@ sendNextBatch = function(req, res) {
   if (!next || !next.length) {
     console.error("WARNING: getNext returned 0 items for id", req.body.fromId);
     return sendStartBatch(res);
+  } else if (next.length < picsPerBatch) {
+    return getStartBatch(res, function(items) {
+      if (!items) {
+        items = [];
+      }
+      return res.send(next.concat(items.slice(0, picsPerBatch - next.length)));
+    });
   } else {
     return res.send(next);
   }
@@ -72,7 +85,6 @@ exports.index = function(req, res, next) {
 };
 
 exports.create = function(req, res) {
-  console.log('adding picture', req.body);
   createImage(req.body.src);
   return res.end("operation queued");
 };
@@ -84,6 +96,7 @@ exports.next = function(req, res) {
     return sendStartBatch(res);
   }
   if (!picCache.items.length) {
+    console.log('/pics/next no items in cache, returning from start');
     return loadItems(function(items) {
       return sendNextBatch(req, res);
     });

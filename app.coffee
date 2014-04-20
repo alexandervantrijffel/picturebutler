@@ -22,18 +22,20 @@ app
       secret: "secreetbro"
       key: "express.sid"
       store: new MemoryStore())
+  .use express.json()
+  .use express.urlencoded()
   .use '/api', app.router
 		.configure 'development', ->
-app.use express.errorHandler(
-          dumpExceptions: true
-          showStack: true)
+        app.use express.errorHandler(
+                  dumpExceptions: true
+                  showStack: true)
   .use errorHandling.logErrors
   .use errorHandling.pageNotFoundHandler
   .use errorHandling.clientErrorHandler
   .use errorHandling.errorHandler
 
 app.resource 'pics', require './pics'
-app.get "/pics/next", pics.next
+app.post "/pics/next", pics.next
 
 server = http.createServer(app)
 server.listen app.get("port"), ->
