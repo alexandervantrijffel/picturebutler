@@ -32,7 +32,7 @@ class PicCache
 			return []
 		itemCount = Math.min count,@items.length-count
 		if itemCount < 0 then itemCount = @items.length-index-1
-		console.log "returning #{itemCount} items starting from index #{index+1}"
+		console.log "getNext: returning #{itemCount} items starting from index #{index+1}"
 		result = @items.slice index+1,index+1+itemCount
 		if !result.length then @getStart() else result
 

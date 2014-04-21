@@ -59,7 +59,7 @@ PicCache = (function() {
     if (itemCount < 0) {
       itemCount = this.items.length - index - 1;
     }
-    console.log("returning " + itemCount + " items starting from index " + (index + 1));
+    console.log("getNext: returning " + itemCount + " items starting from index " + (index + 1));
     result = this.items.slice(index + 1, index + 1 + itemCount);
     if (!result.length) {
       return this.getStart();

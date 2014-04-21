@@ -19,6 +19,8 @@ module.exports.mongo.username = '';
 
 module.exports.mongo.password = '';
 
+module.exports.picsPerBatch = 10;
+
 module.exports.debug = true;
 
 /*

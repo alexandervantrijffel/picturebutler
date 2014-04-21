@@ -52,6 +52,7 @@ server.listen app.get("port"), ->
   return
 
 console.log "Listening on http://127.0.0.1:" + app.get("port")
+console.log "serving #{config.picsPerBatch} pics per batch"
 module.exports.app = app
 
 # catch the uncaught errors that weren't wrapped in a domain or try catch statement

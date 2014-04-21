@@ -53,6 +53,8 @@ server.listen(app.get("port"), function() {
 
 console.log("Listening on http://127.0.0.1:" + app.get("port"));
 
+console.log("serving " + config.picsPerBatch + " pics per batch");
+
 module.exports.app = app;
 
 process.on('uncaughtException', function(err) {

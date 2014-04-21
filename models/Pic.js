@@ -10,6 +10,11 @@ PicSchema = new db.Schema({
     required: true,
     unique: true
   },
+  title: {
+    type: String,
+    required: false,
+    unique: false
+  },
   postedAt: {
     type: Date,
     required: true

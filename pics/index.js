@@ -1,4 +1,4 @@
-var Pic, createImage, fs, getStartBatch, lastRefresh, loadItems, picCache, picsPerBatch, sendCollection, sendNextBatch, setJson, _;
+var Pic, config, createImage, fs, getStartBatch, lastRefresh, loadItems, picCache, picsPerBatch, sendCollection, sendNextBatch, setJson, _;
 
 Pic = require('../models/Pic').Pic;
 
@@ -6,17 +6,20 @@ _ = require('underscore');
 
 fs = require('fs');
 
+config = require("../config");
+
 require('coffee-trace');
 
 picCache = new (require('./PicCache').PicCache);
 
 lastRefresh = void 0;
 
-picsPerBatch = 10;
+picsPerBatch = config.picsPerBatch;
 
-createImage = function(src) {
+createImage = function(src, title) {
   return Pic.create({
     src: src,
+    title: title,
     postedAt: Date.now()
   }, function(err, thePic) {
     if (err) {
@@ -31,7 +34,7 @@ setJson = function(res) {
 };
 
 loadItems = function(callback) {
-  return Pic.find({}, 'id src postedAt', {
+  return Pic.find({}, 'id src postedAt title', {
     skip: 0,
     limit: 100,
     sort: {
@@ -45,7 +48,7 @@ loadItems = function(callback) {
 };
 
 getStartBatch = function(res, callback) {
-  if (true || !lastRefresh || (Date.now() - lastRefresh) / 1000 > 120 || !picCache.items.length) {
+  if (!lastRefresh || (Date.now() - lastRefresh) / 1000 > 120 || !picCache.items.length) {
     console.log('refreshing cache');
     return loadItems(function(items) {
       return callback(items);
@@ -89,12 +92,14 @@ exports.index = function(req, res, next) {
 };
 
 exports.create = function(req, res) {
-  createImage(req.body.src);
+  console.log("create body: ", req.body);
+  createImage(req.body.src, req.body.title);
   return res.end("operation queued");
 };
 
 exports.next = function(req, res) {
   setJson(res);
+  console.log("request for next pictures, body: ", req.body);
   if (!req.body.fromId) {
     console.log('/pics/next no fromId supplied, returning from start');
     return getStartBatch(res, function(items) {

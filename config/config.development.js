@@ -9,6 +9,8 @@ config.twitter_settings = {
   access_token_secret: ''
 };
 
+config.picsPerBatch = 5;
+
 module.exports.config = config;
 
 module.exports.debug = false;
