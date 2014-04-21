@@ -1,4 +1,4 @@
-var PicCache, find, _,
+var PicCache, find, get_type, _,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 _ = require('underscore');
@@ -13,6 +13,13 @@ find = function(collection, test) {
   return -1;
 };
 
+get_type = function(thing) {
+  if (thing === null) {
+    return "[object Null]";
+  }
+  return Object.prototype.toString.call(thing);
+};
+
 PicCache = (function() {
   function PicCache() {
     this.getNext = __bind(this.getNext, this);
@@ -23,11 +30,13 @@ PicCache = (function() {
 
   PicCache.prototype.add = function(newItems) {
     var filtered;
-    filtered = _.filter(this.items, function(item) {
-      return !_.findWhere(newItems, {
-        _id: item._id
-      });
-    });
+    filtered = _.filter(this.items, (function(_this) {
+      return function(item) {
+        return !_.find(newItems, function(n) {
+          return n._id.toString() === item._id.toString();
+        });
+      };
+    })(this));
     return this.items = (_.sortBy(filtered.concat(newItems), function(item) {
       return item.postedAt;
     })).reverse();

@@ -1,4 +1,4 @@
-var MemoryStore, Resource, app, config, errorHandling, express, http, iced, pics, server;
+var MemoryStore, Resource, allowCrossDomain, app, config, errorHandling, express, http, iced, pics, server;
 
 require('coffee-script/register');
 
@@ -22,11 +22,19 @@ app = express();
 
 app.debug = config.debug;
 
+allowCrossDomain = function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  return next();
+};
+
 app.set("port", process.env.PORT || 3001).use(express.logger("dev")).use(express.cookieParser()).use(express.bodyParser()).use(express.methodOverride()).use(express.session({
   secret: "secreetbro",
   key: "express.sid",
   store: new MemoryStore()
-})).use(express.json()).use(express.urlencoded()).use('/api', app.router).configure('development', function() {
+})).use(express.json()).use(express.urlencoded()).use(allowCrossDomain).use('/api', app.router).configure('development', function() {
   return app.use(express.errorHandler({
     dumpExceptions: true,
     showStack: true

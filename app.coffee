@@ -12,6 +12,14 @@ MemoryStore = express.session.MemoryStore
 app = express()
 app.debug = config.debug
 
+allowCrossDomain = (req, res, next) ->
+  #todo: disable in production
+  res.header("Access-Control-Allow-Origin", "*")
+  res.setHeader 'Access-Control-Allow-Credentials', true
+  res.setHeader 'Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS'
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+  next()
+
 app
   .set "port", process.env.PORT or 3001
   .use(express.logger("dev"))
@@ -24,6 +32,7 @@ app
       store: new MemoryStore())
   .use express.json()
   .use express.urlencoded()
+  .use allowCrossDomain
   .use '/api', app.router
 		.configure 'development', ->
         app.use express.errorHandler(

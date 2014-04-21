@@ -12,7 +12,7 @@ createImage = (src)->
 		src: src
 		postedAt: Date.now()
 		 , (err, thePic) ->
-		 	if err console.error then "Cannot add picture: #{err}"
+		 	if err then return console.error "Cannot add picture: #{err}"
 		 	console.log "pic added to db with id #{thePic.id}"
 
 setJson = (res) ->
@@ -28,36 +28,38 @@ loadItems = (callback) ->
 		, (err, pics) ->
 			picCache.add pics
 			lastRefresh = Date.now()
-			callback picCache.getStart			
+			callback picCache.getStart	picsPerBatch
 
 getStartBatch = (res,callback) ->
-	if !lastRefresh || (Date.now() - lastRefresh) / 1000 > 120 || !picCache.items.length # 2 minutes
+	if true || !lastRefresh || (Date.now() - lastRefresh) / 1000 > 120 || !picCache.items.length # 2 minutes
 		console.log 'refreshing cache'
 		loadItems (items) ->
-			callback(picCache.getStart picsPerBatch)
+			callback items
 	else
-		callback(picCache.getStart picsPerBatch)
+		callback picCache.getStart picsPerBatch
 
-sendStartBatch = (res) ->
-	getStartBatch res,(items) ->
-		res.send items
+sendCollection = (res, items) ->
+	res.send 
+		images: items
 
 sendNextBatch = (req, res) ->
 	next = picCache.getNext req.body.fromId, picsPerBatch
 	if !next || !next.length
 		console.error "WARNING: getNext returned 0 items for id",req.body.fromId
-		sendStartBatch res
+		getStartBatch res,(items) ->
+			sendCollection res,items
 	else if next.length < picsPerBatch
 		getStartBatch res, (items) ->
 			if !items
 				items = []
-			res.send next.concat items.slice 0,picsPerBatch-next.length
+			sendCollection res,next.concat items.slice 0,picsPerBatch-next.length
 	else	
-		res.send next
+		sendCollection res,next
 
 exports.index = (req, res, next) ->
 	setJson res
-	sendStartBatch res
+	getStartBatch res,(items) ->
+		sendCollection res,items
 
 exports.create = (req, res) ->
 	createImage req.body.src	
@@ -67,7 +69,8 @@ exports.next = (req, res) ->
 	setJson res
 	if !req.body.fromId
 		console.log '/pics/next no fromId supplied, returning from start'
-		return sendStartBatch res
+		return getStartBatch res,(items) ->
+			sendCollection res,items
 	if !picCache.items.length
 		console.log '/pics/next no items in cache, returning from start'
 		loadItems (items) ->

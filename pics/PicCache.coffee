@@ -5,13 +5,18 @@ find = (collection, test) ->
 		if test(collection[i]) then return i
 	return -1
 
+get_type = (thing) ->
+    if(thing==null) then return "[object Null]"
+    Object.prototype.toString.call(thing)
+
 class PicCache
 	constructor: ->
 		@items = []
 	
-	add: (newItems) =>
-		filtered = _.filter @items, (item) ->
-			return !_.findWhere newItems, _id:item._id
+	add: (newItems) =>		 
+		filtered = _.filter @items, (item) =>
+			return !_.find newItems, (n) ->
+				return n._id.toString() == item._id.toString()
 		@items = (_.sortBy filtered.concat(newItems), (item) ->
 											return item.postedAt
 			).reverse()
